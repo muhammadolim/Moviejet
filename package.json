@@ -1,6 +1,6 @@
 {
   "name": "moviejet",
-  "homepage": "https://muhammadolim.github.io/Moviejet",
+  "homepage": "https://moviejet.vercel.app/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
