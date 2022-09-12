@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/Moviejet/static/css/main.a97bee1d.css",
+    "main.js": "/Moviejet/static/js/main.a82b689e.js",
+    "static/js/787.cdde345f.chunk.js": "/Moviejet/static/js/787.cdde345f.chunk.js",
+    "index.html": "/Moviejet/index.html",
+    "main.a97bee1d.css.map": "/Moviejet/static/css/main.a97bee1d.css.map",
+    "main.a82b689e.js.map": "/Moviejet/static/js/main.a82b689e.js.map",
+    "787.cdde345f.chunk.js.map": "/Moviejet/static/js/787.cdde345f.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.a97bee1d.css",
+    "static/js/main.a82b689e.js"
+  ]
+}
