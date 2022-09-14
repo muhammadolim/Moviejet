@@ -11,7 +11,6 @@ export const loadMovies = () => async (dispatch) => {
     const latestListData = await axios.get(movieListURL("latest"));
     const nowListData = await axios.get(movieListURL("now_playing"));
 
-
     dispatch({
         type: "FETCH_MOVIES",
         payload: {

@@ -65,6 +65,7 @@ const StyledHome = styled.div`
             color: white;
             top: 0;
             padding: 0 4rem;
+            margin-top: 0;
             height: 100%;
 
             @media (max-width: 768px) {

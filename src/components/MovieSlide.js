@@ -36,7 +36,7 @@ const MovieSlide = ({ movie }) => {
                 <div className="shadow"></div>
                 <img
                     src={imageMovieURL("w1280", movie.backdrop_path)}
-                    alt="img"
+                    alt={movie.title}
                 />
             </Link>
         </Slider>
