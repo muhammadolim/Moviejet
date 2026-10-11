@@ -22,16 +22,18 @@ const MovieSlide = ({ movie }) => {
                 <div className="info">
                     <h1>{movie.title}</h1>
                     <div className="genres">
-                        {movie.genre_ids.map((genre_id) => (
+                        {(movie.genre_ids || []).map((genre_id) => (
                             <p key={genre_id}>{get_genre_name(genre_id)}</p>
                         ))}
                     </div>
                 </div>
                 <div className="shadow"></div>
-                <img
-                    src={imageMovieURL("w1280", movie.backdrop_path)}
-                    alt={movie.title}
-                />
+                {movie.backdrop_path && (
+                    <img
+                        src={imageMovieURL("w1280", movie.backdrop_path)}
+                        alt={movie.title}
+                    />
+                )}
             </Link>
         </Slider>
     );
@@ -40,6 +42,7 @@ const MovieSlide = ({ movie }) => {
 const Slider = styled.div`
     position: relative;
     margin-top: 50px;
+    min-height: 80vh;
 
     .info {
         display: flex;
