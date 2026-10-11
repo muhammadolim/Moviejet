@@ -3,8 +3,10 @@ const initState = {
     upcoming: [],
     popular: [],
     top_rated: [],
-    latest: [],
     now_playing: [],
+    isLoading: false,
+    isLoaded: false,
+    hasError: false,
 };
 
 const moviesReducer = (state = initState, action) => {
@@ -29,18 +31,26 @@ const moviesReducer = (state = initState, action) => {
                 ...state,
                 top_rated: action.payload.top_rated,
             };
-        case "FETCH_LATEST":
-            return {
-                ...state,
-                latest: action.payload.latest,
-            };
         case "FETCH_NOW_PLAYING":
             return {
                 ...state,
                 now_playing: action.payload.now_playing,
             };
+        case "LOADING_MOVIES":
+            return {
+                ...state,
+                isLoading: true,
+                hasError: false,
+            };
+        case "MOVIES_SETTLED":
+            return {
+                ...state,
+                isLoading: false,
+                isLoaded: !action.payload.hasError,
+                hasError: action.payload.hasError,
+            };
         default:
-            return { ...state };
+            return state;
     }
 };
 

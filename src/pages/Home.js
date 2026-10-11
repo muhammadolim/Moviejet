@@ -4,10 +4,12 @@ import styled from "styled-components";
 // Redux
 import { useDispatch, useSelector } from "react-redux";
 import { loadMovies } from "../actions/moviesAction";
+import { loadGenres } from "../actions/genresAction";
 
 // Components
 import MovieSlide from "../components/MovieSlide";
 import MovieList from "../components/MovieList";
+import ErrorMessage from "../components/ErrorMessage";
 
 // Swiper
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -17,13 +19,26 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 
 const Home = () => {
-    // Fetch movies
+    // Fetch movies (the actions skip what the store already has)
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(loadMovies());
+        dispatch(loadGenres());
     }, [dispatch]);
     // Get that data back
-    const { trending } = useSelector((state) => state.movies);
+    const { trending, hasError } = useSelector((state) => state.movies);
+
+    if (hasError) {
+        return (
+            <ErrorMessage
+                message="Couldn't load movies"
+                onRetry={() => {
+                    dispatch(loadMovies());
+                    dispatch(loadGenres());
+                }}
+            />
+        );
+    }
 
     return (
         <StyledHome>

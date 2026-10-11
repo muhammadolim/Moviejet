@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useLayoutEffect } from "react";
 import styled from "styled-components";
 import { imageMovieURL } from "../api";
+import { useParams } from "react-router-dom";
 
 // Redux
 import { useDispatch, useSelector } from "react-redux";
@@ -10,16 +11,25 @@ import { loadDetails } from "../actions/detailsAction";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
 import Loader from "../components/Loader";
+import ErrorMessage from "../components/ErrorMessage";
+import NotFound from "./NotFound";
 
 const MovieDetails = () => {
-    const movieId = window.location.pathname.match(/(\d+)/)[0];
+    const { id: movieId } = useParams();
 
     const dispatch = useDispatch();
-    useEffect(() => {
+    // Revisiting a movie that loaded fine reuses it (no refetch). A layout
+    // effect switches any other case to loading before the browser paints,
+    // so a revisit never flashes the last visit's error first
+    useLayoutEffect(() => {
         dispatch(loadDetails(movieId));
     }, [dispatch, movieId]);
 
-    const { data, videos, isLoading } = useSelector((state) => state.details);
+    const { id, data, videos, isLoading, hasError, notFound } = useSelector(
+        (state) => state.details
+    );
+    // Until the effect above runs, the store may still hold another movie
+    const isCurrent = id === movieId;
 
     const get_video = (key) => {
         return `https://www.youtube-nocookie.com/embed/${key}`;
@@ -48,8 +58,11 @@ const MovieDetails = () => {
         "Behind the Scenes",
     ];
 
+    // Only YouTube videos can be embedded with the YouTube player
     const get_videos = (type) => {
-        return videos.filter((video) => video.type === type);
+        return videos.filter(
+            (video) => video.type === type && video.site === "YouTube"
+        );
     };
     const exist_videos = (type) => {
         var arr = get_videos(type);
@@ -57,16 +70,40 @@ const MovieDetails = () => {
         else return true;
     };
 
+    // "2022-08-31" -> "2022 August"; empty when the date is unknown
+    const get_release = (date) => {
+        if (!date) return "";
+        const [year, month] = date.split("-");
+        return `${year} ${months[parseInt(month, 10) - 1] || ""}`.trim();
+    };
+
+    // 63500000 -> "$63.5 million"; empty when the budget is unknown or a
+    // TMDB placeholder (values like 1 or 25000)
+    const get_budget = (budget) => {
+        if (!budget || budget < 1000000) return "";
+        return `$${Math.round(budget / 100000) / 10} million`;
+    };
+
+    if (isCurrent && hasError) {
+        if (notFound) return <NotFound message="Movie not found" />;
+        return (
+            <ErrorMessage
+                message="Couldn't load this movie"
+                onRetry={() => dispatch(loadDetails(movieId))}
+            />
+        );
+    }
+
     return (
         <>
-            {isLoading ? (
+            {isLoading || !isCurrent ? (
                 <Loader />
             ) : (
                 <StyledDetail>
                     <div className="main">
                         <div className="info">
                             <div className="genres">
-                                {data.genres.map((genre) => (
+                                {(data.genres || []).map((genre) => (
                                     <p key={genre.id}>{genre.name}</p>
                                 ))}
                             </div>
@@ -76,30 +113,19 @@ const MovieDetails = () => {
                             </div>
                             <div className="numbers">
                                 <p>
-                                    IMDb{" "}
+                                    TMDB{" "}
                                     {Math.round(10 * data.vote_average) / 10}
                                 </p>
-                                <p>
-                                    {data.release_date.split("-")[0]}{" "}
-                                    {
-                                        months[
-                                            parseInt(
-                                                data.release_date.split("-")[1]
-                                            )
-                                        ]
-                                    }
-                                </p>
-                                <p>
-                                    {data.budget !== 0 && (
-                                        <>${data.budget / 1000000} million</>
-                                    )}
-                                </p>
+                                <p>{get_release(data.release_date)}</p>
+                                <p>{get_budget(data.budget)}</p>
                             </div>
                         </div>
-                        <img
-                            src={imageMovieURL("w1280", data.backdrop_path)}
-                            alt="background"
-                        />
+                        {data.backdrop_path && (
+                            <img
+                                src={imageMovieURL("w780", data.backdrop_path)}
+                                alt="background"
+                            />
+                        )}
                     </div>
 
                     <Tabs>
@@ -127,6 +153,7 @@ const MovieDetails = () => {
                                                     )}?rel=0`}
                                                     frameBorder="0"
                                                     allow="fullscreen;"
+                                                    loading="lazy"
                                                 ></iframe>
                                             );
                                         })}
@@ -145,6 +172,7 @@ const StyledDetail = styled.div`
 
     .main {
         position: relative;
+        min-height: 70vh;
 
         .info {
             display: flex;

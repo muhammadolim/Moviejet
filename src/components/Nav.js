@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 // FontAwesome
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -11,21 +11,40 @@ import {
 
 const Nav = () => {
     const [query, setQuery] = useState("");
-    const [timeoutId, updateTimeoutId] = useState();
+    const timeoutRef = useRef();
 
     const navigate = useNavigate();
+    // Changes on every navigation, even a click on a link to the same page
+    const { key: locationKey } = useLocation();
+
+    // Nav never unmounts: cancel a pending search whenever the user
+    // navigates, or it would pull them back to the search results
+    useEffect(() => () => clearTimeout(timeoutRef.current), [locationKey]);
+
+    const searchPath = (text) =>
+        `/search/${encodeURIComponent(text.trim())}`;
+
+    const search = (text) => {
+        clearTimeout(timeoutRef.current);
+        // "/search/" (empty query) matches no page
+        if (text.trim() === "") return;
+        navigate(searchPath(text));
+    };
 
     const onTextChange = (e) => {
-        clearTimeout(timeoutId);
-        var timeout = setTimeout(() => {
-            navigate(`/search/${e.target.value}`);
-            setQuery(e.target.value);
-        }, 800);
-        updateTimeoutId(timeout);
+        const text = e.target.value;
+        setQuery(text);
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => search(text), 800);
+    };
+
+    const onSearchClick = (e) => {
+        clearTimeout(timeoutRef.current);
+        if (query.trim() === "") e.preventDefault();
     };
 
     const logoHandler = () => {
-        document.getElementById("input-search").value = "";
+        setQuery("");
     };
 
     return (
@@ -41,9 +60,10 @@ const Nav = () => {
                     id="input-search"
                     placeholder="Search..."
                     type="text"
+                    value={query}
                     onChange={onTextChange}
                 />
-                <Link to={`/search/${query}`}>
+                <Link to={searchPath(query)} onClick={onSearchClick}>
                     <FontAwesomeIcon className="icon" icon={faJetFighterUp} />
                 </Link>
             </div>

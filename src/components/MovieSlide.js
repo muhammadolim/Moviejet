@@ -1,19 +1,13 @@
-import React, { useEffect } from "react";
+import React from "react";
 import styled from "styled-components";
 import { imageMovieURL } from "../api";
 
 // Redux
-import { useDispatch, useSelector } from "react-redux";
-import { loadGenres } from "../actions/genresAction";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 const MovieSlide = ({ movie }) => {
-    // Fetch movies
-    const dispatch = useDispatch();
-    useEffect(() => {
-        dispatch(loadGenres());
-    }, [dispatch]);
-    // Get that data back
+    // Genres are fetched once by the Home page
     const genres = useSelector((state) => state.genres);
 
     const get_genre_name = (id) => {
@@ -28,16 +22,18 @@ const MovieSlide = ({ movie }) => {
                 <div className="info">
                     <h1>{movie.title}</h1>
                     <div className="genres">
-                        {movie.genre_ids.map((genre_id) => (
+                        {(movie.genre_ids || []).map((genre_id) => (
                             <p key={genre_id}>{get_genre_name(genre_id)}</p>
                         ))}
                     </div>
                 </div>
                 <div className="shadow"></div>
-                <img
-                    src={imageMovieURL("w1280", movie.backdrop_path)}
-                    alt={movie.title}
-                />
+                {movie.backdrop_path && (
+                    <img
+                        src={imageMovieURL("w1280", movie.backdrop_path)}
+                        alt={movie.title}
+                    />
+                )}
             </Link>
         </Slider>
     );
@@ -46,6 +42,7 @@ const MovieSlide = ({ movie }) => {
 const Slider = styled.div`
     position: relative;
     margin-top: 50px;
+    min-height: 80vh;
 
     .info {
         display: flex;

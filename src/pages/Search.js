@@ -1,14 +1,16 @@
 import React, { useEffect } from "react";
 import styled from "styled-components";
+import { useParams } from "react-router-dom";
 
 // Redux
 import { useDispatch, useSelector } from "react-redux";
 import { loadSearch } from "../actions/searchAction";
 
 import MovieCard from "../components/MovieCard";
+import ErrorMessage from "../components/ErrorMessage";
 
 const Search = () => {
-    const query = window.location.pathname.split("/")[2];
+    const { query } = useParams();
 
     // Fetch movies
     const dispatch = useDispatch();
@@ -16,17 +18,35 @@ const Search = () => {
         dispatch(loadSearch(query));
     }, [dispatch, query]);
     // Get that data back
-    const searched = useSelector((state) => state.search);
+    const search = useSelector((state) => state.search);
+    // Hide the previous query's results while the new ones load
+    const loaded = search.query === query;
+    const searched = loaded ? search.results : [];
+    const failed = loaded && search.hasError;
 
     return (
         <StyledSearch>
             <h2>Results</h2>
+            {failed && (
+                <ErrorMessage
+                    className="search-error"
+                    message="Couldn't load results"
+                    onRetry={() => dispatch(loadSearch(query))}
+                />
+            )}
+            {loaded && !failed && searched.length === 0 && (
+                <p className="no-results">No results for "{query}"</p>
+            )}
             <div className="searched-movies">
-                {searched
+                {[...searched]
                     .sort((a, b) => b.popularity - a.popularity)
                     .slice(0, 10)
                     .map((movie) => (
-                        <MovieCard key={movie.id} movie={movie} />
+                        <MovieCard
+                            key={movie.id}
+                            movie={movie}
+                            sizes="(min-width: 1025px) 20vw, (min-width: 769px) 25vw, (min-width: 426px) 34vw, 50vw"
+                        />
                     ))}
             </div>
         </StyledSearch>
@@ -44,6 +64,17 @@ const StyledSearch = styled.div`
         font-family: "Josefin Sans", sans-serif;
         font-size: 40px;
         line-height: 50px;
+        text-align: center;
+    }
+
+    .search-error {
+        margin-top: 2rem;
+    }
+
+    .no-results {
+        margin: 2rem 3rem;
+        color: #aaa;
+        font-size: 18px;
         text-align: center;
     }
 
