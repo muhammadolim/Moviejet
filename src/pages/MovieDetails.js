@@ -100,7 +100,7 @@ const MovieDetails = () => {
                             </div>
                             <div className="numbers">
                                 <p>
-                                    IMDb{" "}
+                                    TMDB{" "}
                                     {Math.round(10 * data.vote_average) / 10}
                                 </p>
                                 <p>{get_release(data.release_date)}</p>

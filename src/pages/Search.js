@@ -19,11 +19,15 @@ const Search = () => {
     // Get that data back
     const search = useSelector((state) => state.search);
     // Hide the previous query's results while the new ones load
-    const searched = search.query === query ? search.results : [];
+    const loaded = search.query === query;
+    const searched = loaded ? search.results : [];
 
     return (
         <StyledSearch>
             <h2>Results</h2>
+            {loaded && searched.length === 0 && (
+                <p className="no-results">No results for "{query}"</p>
+            )}
             <div className="searched-movies">
                 {[...searched]
                     .sort((a, b) => b.popularity - a.popularity)
@@ -47,6 +51,13 @@ const StyledSearch = styled.div`
         font-family: "Josefin Sans", sans-serif;
         font-size: 40px;
         line-height: 50px;
+        text-align: center;
+    }
+
+    .no-results {
+        margin: 2rem 3rem;
+        color: #aaa;
+        font-size: 18px;
         text-align: center;
     }
 
