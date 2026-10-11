@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useLayoutEffect } from "react";
 import styled from "styled-components";
 import { imageMovieURL } from "../api";
 import { useParams } from "react-router-dom";
@@ -11,20 +11,24 @@ import { loadDetails } from "../actions/detailsAction";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
 import Loader from "../components/Loader";
+import ErrorMessage from "../components/ErrorMessage";
 import NotFound from "./NotFound";
 
 const MovieDetails = () => {
     const { id: movieId } = useParams();
 
     const dispatch = useDispatch();
-    useEffect(() => {
+    // Revisiting a movie that loaded fine reuses it (no refetch). A layout
+    // effect switches any other case to loading before the browser paints,
+    // so a revisit never flashes the last visit's error first
+    useLayoutEffect(() => {
         dispatch(loadDetails(movieId));
     }, [dispatch, movieId]);
 
-    const { id, data, videos, isLoading, hasError } = useSelector(
+    const { id, data, videos, isLoading, hasError, notFound } = useSelector(
         (state) => state.details
     );
-    // Until the effect above runs, the store still holds the previous movie
+    // Until the effect above runs, the store may still hold another movie
     const isCurrent = id === movieId;
 
     const get_video = (key) => {
@@ -73,13 +77,22 @@ const MovieDetails = () => {
         return `${year} ${months[parseInt(month, 10) - 1] || ""}`.trim();
     };
 
-    // 63500000 -> "$63.5 million"; empty when the budget is unknown
+    // 63500000 -> "$63.5 million"; empty when the budget is unknown or a
+    // TMDB placeholder (values like 1 or 25000)
     const get_budget = (budget) => {
-        if (!budget) return "";
+        if (!budget || budget < 1000000) return "";
         return `$${Math.round(budget / 100000) / 10} million`;
     };
 
-    if (isCurrent && hasError) return <NotFound message="Movie not found" />;
+    if (isCurrent && hasError) {
+        if (notFound) return <NotFound message="Movie not found" />;
+        return (
+            <ErrorMessage
+                message="Couldn't load this movie"
+                onRetry={() => dispatch(loadDetails(movieId))}
+            />
+        );
+    }
 
     return (
         <>

@@ -9,6 +9,10 @@ let latestRequest = 0;
 export const loadSearch = (query) => async (dispatch) => {
     const request = ++latestRequest;
 
+    dispatch({
+        type: "LOADING_SEARCH",
+    });
+
     try {
         // Fetch axios
         const searchData = await axios.get(searchMovieURL(query));
@@ -19,6 +23,7 @@ export const loadSearch = (query) => async (dispatch) => {
             payload: {
                 query,
                 results: searchData.data.results,
+                hasError: false,
             },
         });
     } catch (error) {
@@ -29,6 +34,8 @@ export const loadSearch = (query) => async (dispatch) => {
             payload: {
                 query,
                 results: [],
+                // A failed request is not "no results": let the user retry
+                hasError: true,
             },
         });
     }

@@ -4,6 +4,7 @@ const initState = {
     videos: [],
     isLoading: true,
     hasError: false,
+    notFound: false,
 };
 
 const detailReducer = (state = initState, action) => {
@@ -15,6 +16,7 @@ const detailReducer = (state = initState, action) => {
                 videos: action.payload.videos,
                 isLoading: false,
                 hasError: false,
+                notFound: false,
             };
         case "LOADING_DETAILS":
             return {
@@ -22,6 +24,7 @@ const detailReducer = (state = initState, action) => {
                 id: action.payload.id,
                 isLoading: true,
                 hasError: false,
+                notFound: false,
             };
         case "DETAILS_FAILED":
             return {
@@ -30,6 +33,7 @@ const detailReducer = (state = initState, action) => {
                 videos: [],
                 isLoading: false,
                 hasError: true,
+                notFound: action.payload.notFound,
             };
         default:
             return state;

@@ -3,7 +3,9 @@ import styled from "styled-components";
 import { imageMovieURL } from "../api";
 import { Link } from "react-router-dom";
 
-const MovieCard = ({ movie }) => {
+// `sizes` tells the browser how wide the poster is drawn, so it can pick
+// the smallest file that is sharp enough: it must match the parent layout
+const MovieCard = ({ movie, sizes }) => {
     return (
         <StyledCard>
             <Link to={`/movie/${movie.id}`}>
@@ -17,7 +19,7 @@ const MovieCard = ({ movie }) => {
                             "w500",
                             movie.poster_path
                         )} 500w`}
-                        sizes="(min-width: 1024px) 20vw, (min-width: 600px) 33vw, 50vw"
+                        sizes={sizes}
                         loading="lazy"
                         alt={movie.title}
                     />

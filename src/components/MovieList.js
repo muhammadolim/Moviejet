@@ -57,7 +57,10 @@ const MovieList = ({ listName }) => {
             >
                 {getList(listName).map((movie) => (
                     <SwiperSlide key={movie.id}>
-                        <MovieCard movie={movie} />
+                        <MovieCard
+                            movie={movie}
+                            sizes="(min-width: 1024px) 20vw, (min-width: 600px) 34vw, 50vw"
+                        />
                     </SwiperSlide>
                 ))}
             </Swiper>

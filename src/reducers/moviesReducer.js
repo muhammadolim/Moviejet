@@ -4,6 +4,9 @@ const initState = {
     popular: [],
     top_rated: [],
     now_playing: [],
+    isLoading: false,
+    isLoaded: false,
+    hasError: false,
 };
 
 const moviesReducer = (state = initState, action) => {
@@ -32,6 +35,19 @@ const moviesReducer = (state = initState, action) => {
             return {
                 ...state,
                 now_playing: action.payload.now_playing,
+            };
+        case "LOADING_MOVIES":
+            return {
+                ...state,
+                isLoading: true,
+                hasError: false,
+            };
+        case "MOVIES_SETTLED":
+            return {
+                ...state,
+                isLoading: false,
+                isLoaded: !action.payload.hasError,
+                hasError: action.payload.hasError,
             };
         default:
             return state;

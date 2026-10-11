@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 // FontAwesome
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,9 +14,12 @@ const Nav = () => {
     const timeoutRef = useRef();
 
     const navigate = useNavigate();
+    // Changes on every navigation, even a click on a link to the same page
+    const { key: locationKey } = useLocation();
 
-    // Don't let a pending search fire after the component is gone
-    useEffect(() => () => clearTimeout(timeoutRef.current), []);
+    // Nav never unmounts: cancel a pending search whenever the user
+    // navigates, or it would pull them back to the search results
+    useEffect(() => () => clearTimeout(timeoutRef.current), [locationKey]);
 
     const searchPath = (text) =>
         `/search/${encodeURIComponent(text.trim())}`;
@@ -41,8 +44,6 @@ const Nav = () => {
     };
 
     const logoHandler = () => {
-        // Cancel a search still waiting to fire, or it would leave home
-        clearTimeout(timeoutRef.current);
         setQuery("");
     };
 
