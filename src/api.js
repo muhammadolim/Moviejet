@@ -22,4 +22,4 @@ export const movieVideosURL = (movie_id) =>
     `${base_url}movie/${movie_id}/videos${key}`;
 
 export const searchMovieURL = (query) =>
-    `${base_url}search/movie${key}&query=${query}`;
+    `${base_url}search/movie${key}&query=${encodeURIComponent(query)}`;

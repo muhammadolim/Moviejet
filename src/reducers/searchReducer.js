@@ -1,4 +1,7 @@
-const initState = [];
+const initState = {
+    query: null,
+    results: [],
+};
 
 const searchReducer = (state = initState, action) => {
     switch (action.type) {

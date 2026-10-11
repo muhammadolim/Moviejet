@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import styled from "styled-components";
+import { useParams } from "react-router-dom";
 
 // Redux
 import { useDispatch, useSelector } from "react-redux";
@@ -8,7 +9,7 @@ import { loadSearch } from "../actions/searchAction";
 import MovieCard from "../components/MovieCard";
 
 const Search = () => {
-    const query = window.location.pathname.split("/")[2];
+    const { query } = useParams();
 
     // Fetch movies
     const dispatch = useDispatch();
@@ -16,13 +17,15 @@ const Search = () => {
         dispatch(loadSearch(query));
     }, [dispatch, query]);
     // Get that data back
-    const searched = useSelector((state) => state.search);
+    const search = useSelector((state) => state.search);
+    // Hide the previous query's results while the new ones load
+    const searched = search.query === query ? search.results : [];
 
     return (
         <StyledSearch>
             <h2>Results</h2>
             <div className="searched-movies">
-                {searched
+                {[...searched]
                     .sort((a, b) => b.popularity - a.popularity)
                     .slice(0, 10)
                     .map((movie) => (
