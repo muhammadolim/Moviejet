@@ -1,9 +1,8 @@
-import React, { useEffect } from "react";
+import React from "react";
 import styled from "styled-components";
 
 // Redux
-import { useDispatch, useSelector } from "react-redux";
-import { loadMovies } from "../actions/moviesAction";
+import { useSelector } from "react-redux";
 
 // Swiper
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -15,12 +14,7 @@ import "swiper/css/navigation";
 import MovieCard from "./MovieCard";
 
 const MovieList = ({ listName }) => {
-    // Fetch movies
-    const dispatch = useDispatch();
-    useEffect(() => {
-        dispatch(loadMovies());
-    }, [dispatch]);
-    // Get that data back
+    // Movies are fetched once by the Home page
     const { upcoming, popular, top_rated, now_playing } = useSelector(
         (state) => state.movies
     );
@@ -36,7 +30,7 @@ const MovieList = ({ listName }) => {
             case "Top Rated":
                 return top_rated;
             default:
-                break;
+                return [];
         }
     };
 

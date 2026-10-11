@@ -1,19 +1,13 @@
-import React, { useEffect } from "react";
+import React from "react";
 import styled from "styled-components";
 import { imageMovieURL } from "../api";
 
 // Redux
-import { useDispatch, useSelector } from "react-redux";
-import { loadGenres } from "../actions/genresAction";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 const MovieSlide = ({ movie }) => {
-    // Fetch movies
-    const dispatch = useDispatch();
-    useEffect(() => {
-        dispatch(loadGenres());
-    }, [dispatch]);
-    // Get that data back
+    // Genres are fetched once by the Home page
     const genres = useSelector((state) => state.genres);
 
     const get_genre_name = (id) => {

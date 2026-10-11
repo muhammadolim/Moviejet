@@ -4,6 +4,7 @@ import styled from "styled-components";
 // Redux
 import { useDispatch, useSelector } from "react-redux";
 import { loadMovies } from "../actions/moviesAction";
+import { loadGenres } from "../actions/genresAction";
 
 // Components
 import MovieSlide from "../components/MovieSlide";
@@ -21,6 +22,7 @@ const Home = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(loadMovies());
+        dispatch(loadGenres());
     }, [dispatch]);
     // Get that data back
     const { trending } = useSelector((state) => state.movies);
